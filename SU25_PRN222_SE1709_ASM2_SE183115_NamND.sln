@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36127.28
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrugPrevention.Repositories.NamND", "DrugPrevention.Repositories.NamND\DrugPrevention.Repositories.NamND.csproj", "{4553899F-BD6E-DBCE-7901-17554EB43BC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrugPrevention.Services.NamND", "DrugPrevention.Services.NamND\DrugPrevention.Services.NamND.csproj", "{2343391E-22C2-BAE8-5FC1-0ECC756990E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrugPrevention.BlazorWebApp.NamND", "DrugPrevention.BlazorWebApp.NamND\DrugPrevention.BlazorWebApp.NamND.csproj", "{728FE290-1EB9-42FF-B1FD-EFE41F9EE071}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4553899F-BD6E-DBCE-7901-17554EB43BC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4553899F-BD6E-DBCE-7901-17554EB43BC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4553899F-BD6E-DBCE-7901-17554EB43BC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4553899F-BD6E-DBCE-7901-17554EB43BC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2343391E-22C2-BAE8-5FC1-0ECC756990E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2343391E-22C2-BAE8-5FC1-0ECC756990E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2343391E-22C2-BAE8-5FC1-0ECC756990E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2343391E-22C2-BAE8-5FC1-0ECC756990E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{728FE290-1EB9-42FF-B1FD-EFE41F9EE071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{728FE290-1EB9-42FF-B1FD-EFE41F9EE071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{728FE290-1EB9-42FF-B1FD-EFE41F9EE071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{728FE290-1EB9-42FF-B1FD-EFE41F9EE071}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B89BE46-01A8-4DF4-BA3F-8680B00A6B1A}
+	EndGlobalSection
+EndGlobal

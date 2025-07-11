@@ -1,0 +1,430 @@
+﻿@page "/SurveyQuestionsNamNDs/SurveyQuestionsNamNDDetail/{QuestionNamNDID:int}"
+@attribute [StreamRendering]
+@using DrugPrevention.Repositories.NamND.Models
+@inject NavigationManager Navigation
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .detail-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-table {
+        margin: 0;
+        border: none;
+    }
+
+    .detail-table tbody tr {
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .detail-table tbody tr:hover {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+
+    .detail-table tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    .detail-table tbody tr:nth-child(even):hover {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+    }
+
+    .detail-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border: none;
+        width: 200px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        vertical-align: middle;
+    }
+
+    .detail-table td {
+        padding: 1rem 1.5rem;
+        border: none;
+        vertical-align: middle;
+        font-size: 0.95rem;
+        color: #2d3748;
+        line-height: 1.5;
+    }
+
+    .status-badge {
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+    }
+
+    .status-inactive {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(237, 137, 54, 0.3);
+    }
+
+    .required-yes {
+        background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(56, 161, 105, 0.3);
+    }
+
+    .required-no {
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+    }
+
+    .question-type-badge {
+        background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(128, 90, 213, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .risk-weight-badge {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .order-badge {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 2rem;
+    }
+
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 70vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+    }
+
+    .question-text-content {
+        font-weight: 600;
+        color: #2d3748;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    .empty-value {
+        color: #a0aec0;
+        font-style: italic;
+    }
+</style>
+
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="mb-0">📋 Survey Question Details</h1>
+        <p class="mb-0 mt-2 opacity-75">Detailed information about the survey question</p>
+    </div>
+</div>
+
+@if (surveyQuestionsNamND == null)
+{
+    <div class="loading-container">
+        <div class="text-center">
+            <img src="/pacman.gif" alt="Loading..." style="width: 300px; height: 300px;" />
+        </div>
+    </div>
+}
+else
+{
+    <div class="detail-container">
+        <div class="detail-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    📝 Question Information
+                </h2>
+            </div>
+
+            <!-- Question Text - Featured Section -->
+            <div style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; border-left: 5px solid #667eea;">
+                <h3 style="color: #2d3748; margin-bottom: 1rem; font-size: 1.2rem; font-weight: 600;">📝 Question Content</h3>
+                <div class="question-text-content" style="font-size: 1.1rem; line-height: 1.6; color: #2d3748;">
+                    @if (!string.IsNullOrEmpty(surveyQuestionsNamND.QuestionText))
+                    {
+                        @surveyQuestionsNamND.QuestionText
+                    }
+                    else
+                    {
+                        <span class="empty-value">No question text provided</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+
+                <!-- Left Column - Main Information -->
+                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <h4 style="color: #4a5568; margin-bottom: 1.5rem; font-size: 1rem; font-weight: 600; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">
+                        🎯 Main Information
+                    </h4>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Question Type</label>
+                        @if (!string.IsNullOrEmpty(surveyQuestionsNamND.QuestionType))
+                        {
+                            <span class="question-type-badge">@surveyQuestionsNamND.QuestionType</span>
+                        }
+                        else
+                        {
+                            <span class="empty-value">Not specified</span>
+                        }
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Status</label>
+                        <span class="status-badge @(surveyQuestionsNamND.IsActive ? "status-active" : "status-inactive")">
+                            @(surveyQuestionsNamND.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Required</label>
+                        <span class="status-badge @(surveyQuestionsNamND.IsRequired ? "required-yes" : "required-no")">
+                            @(surveyQuestionsNamND.IsRequired ? "Yes" : "No")
+                        </span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(surveyQuestionsNamND.Options))
+                    {
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Options</label>
+                            <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; line-height: 1.6; color: #2d3748; font-size: 0.9rem;">
+                                @surveyQuestionsNamND.Options
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right Column - Secondary Information -->
+                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                    <h4 style="color: #4a5568; margin-bottom: 1.5rem; font-size: 1rem; font-weight: 600; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">
+                        📊 Details
+                    </h4>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Question Order</label>
+                        <span class="order-badge">@surveyQuestionsNamND.QuestionOrder</span>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Risk Weight</label>
+                        <span class="risk-weight-badge">@surveyQuestionsNamND.RiskWeight</span>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Created Date</label>
+                        <div style="color: #4a5568; font-weight: 500;">
+                            @if (surveyQuestionsNamND.CreatedDate.HasValue)
+                            {
+                                @surveyQuestionsNamND.CreatedDate.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span class="empty-value">Not specified</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Survey</label>
+                        <div style="color: #2d3748; font-weight: 600;">
+                            @if (!string.IsNullOrEmpty(surveyQuestionsNamND.SurveyNamND?.SurveyName))
+                            {
+                                @surveyQuestionsNamND.SurveyNamND.SurveyName
+                            }
+                            else
+                            {
+                                <span class="empty-value">No survey assigned</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: #a0aec0; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+                        ID: @surveyQuestionsNamND.QuestionNamNDID
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optional Information - Only show if data exists -->
+            @if (HasOptionalData())
+            {
+                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 2rem;">
+                    <h4 style="color: #4a5568; margin-bottom: 1.5rem; font-size: 1rem; font-weight: 600; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">
+                        🔧 Additional Information
+                    </h4>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; align-items: start;">
+                        @if (!string.IsNullOrEmpty(surveyQuestionsNamND.HelpText))
+                        {
+                            <div style="height: 100%;">
+                                <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Help Text</label>
+                                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; line-height: 1.6; color: #2d3748; font-size: 0.9rem; min-height: 80px; display: flex; align-items: center; justify-content: flex-start;">
+                                    @surveyQuestionsNamND.HelpText
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(surveyQuestionsNamND.Section))
+                        {
+                            <div style="height: 100%;">
+                                <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Section</label>
+                                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; line-height: 1.6; color: #2d3748; font-size: 0.9rem; min-height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    @surveyQuestionsNamND.Section
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(surveyQuestionsNamND.Tag))
+                        {
+                            <div style="height: 100%;">
+                                <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Tag</label>
+                                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; line-height: 1.6; color: #2d3748; font-size: 0.9rem; min-height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    @surveyQuestionsNamND.Tag
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(surveyQuestionsNamND.Language))
+                        {
+                            <div style="height: 100%;">
+                                <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Language</label>
+                                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; line-height: 1.6; color: #2d3748; font-size: 0.9rem; min-height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    @surveyQuestionsNamND.Language
+                                </div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(surveyQuestionsNamND.ImageURL))
+                        {
+                            <div style="height: 100%;">
+                                <label style="font-weight: 600; color: #718096; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Image</label>
+                                <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; line-height: 1.6; color: #2d3748; font-size: 0.9rem; min-height: 80px; display: flex; align-items: center; justify-content: center;">
+                                    <a href="@surveyQuestionsNamND.ImageURL" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                                        View Image →
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <NavLink class="btn-back" href="/SurveyQuestionsNamNDs/SurveyQuestionsNamNDList">
+                ← Back to List
+            </NavLink>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int QuestionNamNDID { get; set; }
+
+    private SurveyQuestionsNamND surveyQuestionsNamND;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+        surveyQuestionsNamND = await _serviceProviders.SurveyQuestionsNamNDService.GetByIdAsync(QuestionNamNDID);
+    }
+
+    private bool HasOptionalData()
+    {
+        if (surveyQuestionsNamND == null) return false;
+
+        return !string.IsNullOrEmpty(surveyQuestionsNamND.HelpText) ||
+               !string.IsNullOrEmpty(surveyQuestionsNamND.Section) ||
+               !string.IsNullOrEmpty(surveyQuestionsNamND.Tag) ||
+               !string.IsNullOrEmpty(surveyQuestionsNamND.Language) ||
+               !string.IsNullOrEmpty(surveyQuestionsNamND.ImageURL);
+    }
+}

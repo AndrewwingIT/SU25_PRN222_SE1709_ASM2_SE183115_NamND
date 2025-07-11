@@ -1,0 +1,419 @@
+﻿@page "/SurveyQuestionsNamNDs/SurveyQuestionsNamNDForm/{QuestionNamNDID:int}"
+@page "/SurveyQuestionsNamNDs/SurveyQuestionsNamNDForm"
+
+@using DrugPrevention.Repositories.NamND.Models
+@inject NavigationManager Navigation
+@inject IServiceProviders _serviceProviders
+@inject IJSRuntime JSRuntime
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .form-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    }
+
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+    }
+
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 70vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+    }
+
+    label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+
+    .validation-message {
+        color: #e53e3e;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Thêm style cho dấu sao đánh dấu trường bắt buộc */
+    .text-danger {
+        color: #e53e3e !important;
+        font-weight: bold;
+    }
+</style>
+
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="mb-0">@(QuestionNamNDID == 0 ? "✏️ Create New Question" : "🔄 Edit Question")</h1>
+        <p class="mb-0 mt-2 opacity-75">@(QuestionNamNDID == 0 ? "Add a new survey question" : "Update existing survey question")</p>
+    </div>
+</div>
+
+@if (surveyQuestion == null)
+{
+    <div class="loading-container">
+        <div class="text-center">
+            <img src="/pacman.gif" alt="Loading..." style="width: 300px; height: 300px;" />
+        </div>
+    </div>
+}
+else
+{
+    <div class="container form-container">
+        <div class="form-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    @(QuestionNamNDID == 0 ? "✏️ Create Question" : "🔄 Edit Question")
+                </h2>
+            </div>
+            <div class="card-body p-4">
+                <EditForm Model="surveyQuestion" OnValidSubmit="async () => await SaveChange()">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    
+                    <div class="alert alert-info mb-4">
+                        <small><span class="text-danger">*</span> indicates required fields</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="hidden" @bind="@surveyQuestion.QuestionNamNDID" />
+
+                            <div class="form-group">
+                                <label>Survey <span class="text-danger">*</span></label>
+                                <InputSelect @bind-Value="surveyQuestion.SurveyNamNDID" class="form-control">
+                                    @foreach (var survey in surveys)
+                                    {
+                                        <option value="@survey.SurveyNamNDID">@string.Format("{0} - {1} - {2}", survey.SurveyName, survey.SurveyPurpose, survey.CreatedDate)</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Question Text <span class="text-danger">*</span></label>
+                                <InputTextArea @bind-Value="surveyQuestion.QuestionText" class="form-control" rows="3" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Question Order <span class="text-danger">*</span></label>
+                                        <InputNumber @bind-Value="surveyQuestion.QuestionOrder" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Question Type <span class="text-danger">*</span></label>
+                                        <InputText @bind-Value="surveyQuestion.QuestionType" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group form-check mt-4">
+                                        <InputCheckbox @bind-Value="surveyQuestion.IsActive" class="form-check-input" id="isActive" />
+                                        <label class="form-check-label" for="isActive">Active</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group form-check mt-4">
+                                        <InputCheckbox @bind-Value="surveyQuestion.IsRequired" class="form-check-input" id="isRequired" />
+                                        <label class="form-check-label" for="isRequired">Required</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Options</label>
+                                <InputText @bind-Value="surveyQuestion.Options" class="form-control" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Risk Weight</label>
+                                        <InputNumber @bind-Value="surveyQuestion.RiskWeight" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Created Date</label>
+                                        <InputDate @bind-Value="surveyQuestion.CreatedDate" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Help Text</label>
+                                <InputText @bind-Value="surveyQuestion.HelpText" class="form-control" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Section</label>
+                                        <InputText @bind-Value="surveyQuestion.Section" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tag</label>
+                                        <InputText @bind-Value="surveyQuestion.Tag" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h4 class="mb-3">Additional Settings</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Language</label>
+                                <InputText @bind-Value="surveyQuestion.Language" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Depends On Question ID</label>
+                                <InputNumber @bind-Value="surveyQuestion.DependsOnQuestionID" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Depends On Answer</label>
+                                <InputText @bind-Value="surveyQuestion.DependsOnAnswer" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Min Score</label>
+                                <InputNumber @bind-Value="surveyQuestion.MinScore" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Max Score</label>
+                                <InputNumber @bind-Value="surveyQuestion.MaxScore" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Display Style</label>
+                                <InputText @bind-Value="surveyQuestion.DisplayStyle" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Image URL</label>
+                                <InputText @bind-Value="surveyQuestion.ImageURL" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        @if (QuestionNamNDID != 0)
+                        {
+                            <button type="button" class="btn btn-danger" @onclick="async () => await DeleteQuestion(QuestionNamNDID)">Delete</button>
+                        }
+                        <button type="button" class="btn btn-secondary" @onclick="GoBack">Back to List</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public int QuestionNamNDID { get; set; }
+
+    private SurveyQuestionsNamND surveyQuestion;
+    private List<SurveysNamND> surveys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        surveyQuestion = await _serviceProviders.SurveyQuestionsNamNDService.GetByIdAsync(QuestionNamNDID);
+        surveys = await _serviceProviders.SurveysNamNDService.GetAllAsync();
+    }
+
+    // private async Task HandleValidSubmit()
+    // {
+    //     await _serviceProviders.SurveyQuestionsNamNDService.UpdateAsync(surveyQuestion);
+    //     Navigation.NavigateTo("/SurveyQuestionsNamNDs/SurveyQuestionsNamNDList");
+    // }
+
+    protected async Task SaveChange()
+    {
+        int result = 0;
+
+        if(QuestionNamNDID == 0)
+        {
+            result = await _serviceProviders.SurveyQuestionsNamNDService.CreateAsync(surveyQuestion);
+        }
+        else
+        {
+            // Đảm bảo lấy từ DB để EF tracking đúng đối tượng
+            var existingEntity = await _serviceProviders.SurveyQuestionsNamNDService.GetByIdAsync(QuestionNamNDID);
+
+            if (existingEntity != null)
+            {
+                // Gán thủ công từng property (cập nhật những gì bạn cho phép)
+                existingEntity.SurveyNamNDID = surveyQuestion.SurveyNamNDID;
+                existingEntity.QuestionText = surveyQuestion.QuestionText;
+                existingEntity.QuestionOrder = surveyQuestion.QuestionOrder;
+                existingEntity.IsActive = surveyQuestion.IsActive;
+                existingEntity.CreatedDate = surveyQuestion.CreatedDate;
+                existingEntity.QuestionType = surveyQuestion.QuestionType;
+                existingEntity.IsRequired = surveyQuestion.IsRequired;
+                existingEntity.Options = surveyQuestion.Options;
+                existingEntity.RiskWeight = surveyQuestion.RiskWeight;
+                existingEntity.HelpText = surveyQuestion.HelpText;
+                existingEntity.Section = surveyQuestion.Section;
+                existingEntity.Tag = surveyQuestion.Tag;
+                existingEntity.Language = surveyQuestion.Language;
+                existingEntity.DependsOnQuestionID = surveyQuestion.DependsOnQuestionID;
+                existingEntity.DependsOnAnswer = surveyQuestion.DependsOnAnswer;
+                existingEntity.MinScore = surveyQuestion.MinScore;
+                existingEntity.MaxScore = surveyQuestion.MaxScore;
+                existingEntity.DisplayStyle = surveyQuestion.DisplayStyle;
+                existingEntity.ImageURL = surveyQuestion.ImageURL;
+
+                result = await _serviceProviders.SurveyQuestionsNamNDService.UpdateAsync(existingEntity);
+            }
+        }
+
+        Navigation.NavigateTo("/SurveyQuestionsNamNDs/SurveyQuestionsNamNDList");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/SurveyQuestionsNamNDs/SurveyQuestionsNamNDList");
+    }
+
+    private bool IsNewQuestion => QuestionNamNDID == 0;
+    
+    private async Task DeleteQuestion(int id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this question?");
+        
+        if (confirmed)
+        {
+            await _serviceProviders.SurveyQuestionsNamNDService.DeleteAsync(id);
+            Navigation.NavigateTo("/SurveyQuestionsNamNDs/SurveyQuestionsNamNDList");
+        }
+    }
+}
